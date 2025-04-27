@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sudoku Solver</title>
+    <style>
+      :root {
+        --theme-color: #0066ff;
+      }
+      .buttons {
+        display: flex;
+        gap: 1rem;
+        margin: 1rem;
+      }
+      #importDialog {
+      }
+      #importTextarea {
+        width: 9rem;
+        height: 9rem;
+        font-size: 1rem;
+      }
+      #sudokuTable {
+        border-collapse: collapse;
+      }
+      #sudokuTable td {
+        border: 1px solid #000;
+        --size: 2rem;
+        width: var(--size);
+        height: var(--size);
+      }
+      #sudokuTable td input {
+        width: var(--size);
+        height: var(--size);
+        text-align: center;
+        font-size: var(--size);
+        border: none;
+        background-color: transparent;
+      }
+      #sudokuTable input[data-state='fixed'] {
+        color: #000;
+      }
+      #sudokuTable input[data-state='unknown'] {
+        color: var(--theme-color);
+      }
+      #sudokuTable input[data-state='wrong'] {
+        color: #f00;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Sudoku Solver</h1>
+    <div class="buttons">
+      <button id="importButton">Import</button>
+      <button id="solveButton">Solve</button>
+    </div>
+    <dialog id="importDialog">
+      <textarea
+        id="importTextarea"
+        placeholder="Paste sudoku table here"
+      ></textarea>
+      <div class="buttons">
+        <button onclick="importDialog.close()">Close</button>
+      </div>
+    </dialog>
+    <table id="sudokuTable">
+      <tbody id="sudokuTableBody"></tbody>
+    </table>
+    <script src="bundle.js"></script>
+  </body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "name": "sudoku",
+  "version": "1.0.0",
+  "description": "This is mainly used for practising C.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npm run build -- --watch",
+    "build": "esbuild src/app.ts --bundle --outfile=public/bundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beenotung/sudoku.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/beenotung/sudoku/issues"
+  },
+  "homepage": "https://github.com/beenotung/sudoku#readme",
+  "devDependencies": {
+    "@types/node": "^22.14.1",
+    "esbuild": "^0.25.2",
+    "typescript": "^5.8.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}
