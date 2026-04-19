@@ -24,14 +24,17 @@
         border-collapse: collapse;
       }
       #sudokuTable td {
-        border: 1px solid #000;
-        --size: 2rem;
+        outline: 1px solid #000;
+        padding: 0;
+        --size: 3rem;
         width: var(--size);
         height: var(--size);
+        position: relative;
       }
       #sudokuTable td input {
         width: var(--size);
         height: var(--size);
+        padding: 0.25rem;
         text-align: center;
         font-size: var(--size);
         border: none;
@@ -45,6 +48,30 @@
       }
       #sudokuTable input[data-state='wrong'] {
         color: #f00;
+      }
+      .possible-values--container {
+        pointer-events: none;
+        position: absolute;
+        display: flex;
+        flex-wrap: wrap;
+        top: 0;
+        left: 0;
+        width: calc(var(--size) + 0.5rem);
+        height: calc(var(--size) + 0.5rem);
+        font-size: calc(var(--size) / 3);
+        /* background-color: rgba(0, 0, 0, 0.5); */
+      }
+      .possible-values--item {
+        width: calc((var(--size) + 0.5rem) / 3);
+        height: calc((var(--size) + 0.5rem) / 3);
+        outline: 1px solid #ccc;
+        background-color: #eee;
+        color: #000;
+        text-align: center;
+        opacity: 0.8;
+      }
+      [hidden] {
+        display: none !important;
       }
     </style>
   </head>

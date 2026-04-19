@@ -17,6 +17,10 @@ type Cell = {
   group: number
   row: number
   col: number
+  possibleValues: {
+    container: HTMLDivElement
+    items: HTMLDivElement[]
+  }
 }
 
 type Table = {
@@ -91,15 +95,33 @@ function initCell(options: { row: number; col: number }): Cell {
         break
     }
   })
+  let possibleValues = initPossibleValues()
   td.appendChild(input)
+  td.appendChild(possibleValues.container)
   let cell: Cell = {
     td,
     input,
     group,
     row: options.row,
     col: options.col,
+    possibleValues,
   }
   return cell
+}
+
+function initPossibleValues() {
+  let container = document.createElement('div')
+  container.className = 'possible-values--container'
+  let items: HTMLDivElement[] = []
+  for (let i = 1; i <= 9; i++) {
+    let item = document.createElement('div')
+    item.className = 'possible-values--item'
+    item.dataset.value = i.toString()
+    item.textContent = i.toString()
+    items.push(item)
+    container.appendChild(item)
+  }
+  return { container, items }
 }
 
 let table = initTable()
@@ -128,8 +150,10 @@ function updateCell(cell: Cell) {
   let input = cell.input
   let value = input.value
   if (value.length > 1) {
-    input.value = value.slice(-1).trim()
+    value = value.slice(-1).trim()
+    input.value = value
   }
+  cell.possibleValues.container.hidden = value.length > 0
 }
 
 function exportTable() {
@@ -167,6 +191,9 @@ function importTable() {
       }
     })
   })
+  for (let cell of table.cells) {
+    updateCell(cell)
+  }
 }
 importTextarea.addEventListener('input', importTable)
 
