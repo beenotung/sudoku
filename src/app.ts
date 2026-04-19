@@ -90,7 +90,11 @@ function initCell(options: { row: number; col: number }): Cell {
   td.dataset.col = options.col.toString()
   td.dataset.group = group.toString()
   input.inputMode = 'numeric'
-  input.addEventListener('input', () => updateCell(cell))
+  input.addEventListener('input', () => {
+    updateCell(cell)
+    focusCell(cell)
+  })
+  input.addEventListener('focus', () => focusCell(cell))
   input.addEventListener('keydown', event => {
     switch (event.key) {
       case 'ArrowLeft':
@@ -151,11 +155,41 @@ function getInput(options: { row: number; col: number }): HTMLInputElement {
   return getCell(options).input
 }
 
+function clearHighlights() {
+  for (let node of document.querySelectorAll('.highlight')) {
+    node.classList.remove('highlight')
+    node.classList.remove('direct')
+    node.classList.remove('indirect')
+  }
+}
+
 function focusCell(options: { row: number; col: number }) {
   let row = (options.row + 9) % 9
   let col = (options.col + 9) % 9
   let input = getInput({ row, col })
   input.focus()
+  clearHighlights()
+  let value = input.value.trim()
+  if (value) {
+    for (let cell of table.cells) {
+      if (cell.input.value === value) {
+        for (let cells of [
+          table.rows[cell.row],
+          table.cols[cell.col],
+          table.groups[cell.group],
+        ]) {
+          for (let cell of cells) {
+            cell.input.classList.add('highlight')
+            if (cell.input.value === value) {
+              cell.input.classList.add('direct')
+            } else {
+              cell.input.classList.add('indirect')
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 function updateCell(cell: Cell) {
@@ -421,6 +455,7 @@ function importTable() {
   for (let cell of table.cells) {
     updateCell(cell)
   }
+  clearHighlights()
 }
 importTextarea.addEventListener('input', importTable)
 
@@ -512,6 +547,7 @@ function solveTable() {
     }
     break
   }
+  clearHighlights()
 }
 
 function getPossibleValues(cell: Cell): number[] {
