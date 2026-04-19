@@ -48,6 +48,9 @@ function initCell(options: { row: number; col: number }): Cell {
   let input = document.createElement('input')
   let group = toGroupIndex(options)
   td.style.backgroundColor = group % 2 == 0 ? '#ccc' : '#fff'
+  td.dataset.row = options.row.toString()
+  td.dataset.col = options.col.toString()
+  td.dataset.group = group.toString()
   input.inputMode = 'numeric'
   input.addEventListener('input', exportTable)
   input.addEventListener('keydown', event => {
