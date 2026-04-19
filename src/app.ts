@@ -209,7 +209,7 @@ function solveTable() {
       }
 
       // remove values in the same group
-      for (let cell of cells) {
+      for (let cell of table.cells) {
         if (cell.group == group) {
           possibleValues.delete(getValue(cell)!)
         }
