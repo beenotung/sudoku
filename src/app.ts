@@ -80,10 +80,7 @@ function initCell(options: { row: number; col: number }): Cell {
   td.dataset.col = options.col.toString()
   td.dataset.group = group.toString()
   input.inputMode = 'numeric'
-  input.addEventListener('input', () => {
-    updateCell(cell)
-    console.log(exportTable())
-  })
+  input.addEventListener('input', () => updateCell(cell))
   input.addEventListener('keydown', event => {
     switch (event.key) {
       case 'ArrowLeft':
