@@ -1,4 +1,5 @@
 /* buttons */
+declare var emptyButton: HTMLButtonElement
 declare var importButton: HTMLButtonElement
 declare var exportButton: HTMLButtonElement
 declare var resetButton: HTMLButtonElement
@@ -205,7 +206,13 @@ function exportTable() {
 function importTable() {
   let text = importTextarea.value
   let lines = text.split('\n')
+  while (lines.length < 9) {
+    lines.push('')
+  }
   lines.forEach((line, row) => {
+    while (line.length < 9) {
+      line += ' '
+    }
     line.split('').forEach((value, col) => {
       if (value == '_') value = ''
       if (value == ' ') value = ''
@@ -230,6 +237,11 @@ function importTable() {
   }
 }
 importTextarea.addEventListener('input', importTable)
+
+emptyButton.addEventListener('click', () => {
+  importTextarea.value = ''
+  importTable()
+})
 
 importButton.addEventListener('click', () => {
   importDialog.showModal()
