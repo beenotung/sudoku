@@ -114,6 +114,7 @@ function importTable() {
   lines.forEach((line, row) => {
     line.split('').forEach((value, col) => {
       if (value == '_') value = ''
+      if (value == ' ') value = ''
       let input = getInput({ row, col })
       if (!input) {
         console.error(`input not found:`, { row, col })
