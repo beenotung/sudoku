@@ -210,18 +210,22 @@ function populatePossibleValues(cell: Cell): { changed: boolean } {
     let sameColCells: Cell[] = []
     let sameGroupCells: Cell[] = []
     for (let col = 0; col < 9; col++) {
-      let cell = getCell({ row, col })
-      if (!getIsSamePossibleValues(possibleValues, cell)) continue
-      sameRowCells.push(cell)
+      checkOtherCell(sameRowCells, getCell({ row, col }))
     }
     for (let row = 0; row < 9; row++) {
-      let cell = getCell({ row, col })
-      if (!getIsSamePossibleValues(possibleValues, cell)) continue
-      sameColCells.push(cell)
+      checkOtherCell(sameColCells, getCell({ row, col }))
     }
     for (let cell of table.groups[group]) {
-      if (!getIsSamePossibleValues(possibleValues, cell)) continue
-      sameGroupCells.push(cell)
+      checkOtherCell(sameGroupCells, cell)
+    }
+    function checkOtherCell(sameCells: Cell[], cell: Cell) {
+      let otherPossibleValues = getPossibleValues(cell)
+      if (
+        getIsSamePossibleValues(possibleValues, otherPossibleValues) ||
+        getIsSetSetPossibleValues(possibleValues, otherPossibleValues)
+      ) {
+        sameCells.push(cell)
+      }
     }
 
     // remove combo-values
@@ -258,16 +262,17 @@ function populatePossibleValues(cell: Cell): { changed: boolean } {
   return { changed }
 }
 
-function getIsSamePossibleValues(a: number[], b: Cell | number[]): boolean {
-  if (!Array.isArray(b)) {
-    b = getPossibleValues(b)
-  }
+function getIsSamePossibleValues(a: number[], b: number[]): boolean {
   if (a.length !== b.length) return false
   let n = a.length
   for (let i = 0; i < n; i++) {
     if (a[i] !== b[i]) return false
   }
   return true
+}
+
+function getIsSetSetPossibleValues(a: number[], b: number[]): boolean {
+  return a.length > 0 && b.length > 0 && b.every(value => a.includes(value))
 }
 
 function removeByValue(cells: Cell[], cell: Cell) {
