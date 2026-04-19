@@ -209,10 +209,12 @@ function importTable() {
   while (lines.length < 9) {
     lines.push('')
   }
+  lines = lines.slice(0, 9)
   lines.forEach((line, row) => {
     while (line.length < 9) {
       line += ' '
     }
+    line = line.slice(0, 9)
     line.split('').forEach((value, col) => {
       if (value == '_') value = ''
       if (value == ' ') value = ''
