@@ -272,11 +272,7 @@ solveButton.addEventListener('click', solveTable)
 function solveTable() {
   solve_loop: for (;;) {
     for (let cell of table.cells) {
-      let possibleValues: number[] = []
-      for (let item of cell.possibleValues.items) {
-        if (item.hidden) continue
-        possibleValues.push(+item.dataset.value!)
-      }
+      let possibleValues = getPossibleValues(cell)
       if (possibleValues.length === 1) {
         cell.input.value = possibleValues[0].toString()
         updateCell(cell)
@@ -285,6 +281,15 @@ function solveTable() {
     }
     break
   }
+}
+
+function getPossibleValues(cell: Cell): number[] {
+  let possibleValues: number[] = []
+  for (let item of cell.possibleValues.items) {
+    if (item.hidden) continue
+    possibleValues.push(+item.dataset.value!)
+  }
+  return possibleValues
 }
 
 function getValue(options: { row: number; col: number }): number | null {
