@@ -159,7 +159,7 @@ function updateCell(cell: Cell) {
     value = value.slice(-1).trim()
     input.value = value
   }
-  cell.possibleValues.container.hidden = value.length > 0
+  cell.possibleValues.container.hidden = +value > 0
   populatePossibleValues(cell)
 }
 
@@ -173,21 +173,98 @@ function resetPossibleValues() {
 
 function populatePossibleValues(cell: Cell) {
   let value = +cell.input.value
-  if (!value) return
-  for (let item of cell.possibleValues.items) {
-    item.hidden = true
-  }
-  let index = value - 1
   let { row, col, group } = cell
-  for (let col = 0; col < 9; col++) {
-    getCell({ row, col }).possibleValues.items[index].hidden = true
+
+  if (value) {
+    let index = value - 1
+    for (let item of cell.possibleValues.items) {
+      item.hidden = true
+    }
+
+    // remove direct values in the same row/col/group
+    for (let col = 0; col < 9; col++) {
+      getCell({ row, col }).possibleValues.items[index].hidden = true
+    }
+    for (let row = 0; row < 9; row++) {
+      getCell({ row, col }).possibleValues.items[index].hidden = true
+    }
+    for (let cell of table.groups[group]) {
+      cell.possibleValues.items[index].hidden = true
+    }
+    return
   }
-  for (let row = 0; row < 9; row++) {
-    getCell({ row, col }).possibleValues.items[index].hidden = true
+
+  // remove combo-values in the same row/col
+  let possibleValues = getPossibleValues(cell)
+  if (possibleValues.length > 1) {
+    // scan same row/col/group
+    let sameRowCells: Cell[] = []
+    let sameColCells: Cell[] = []
+    let sameGroupCells: Cell[] = []
+    for (let col = 0; col < 9; col++) {
+      let cell = getCell({ row, col })
+      if (!getIsSamePossibleValues(possibleValues, cell)) continue
+      sameRowCells.push(cell)
+    }
+    for (let row = 0; row < 9; row++) {
+      let cell = getCell({ row, col })
+      if (!getIsSamePossibleValues(possibleValues, cell)) continue
+      sameColCells.push(cell)
+    }
+    for (let cell of table.groups[group]) {
+      if (!getIsSamePossibleValues(possibleValues, cell)) continue
+      sameGroupCells.push(cell)
+    }
+
+    // remove combo-values
+    if (sameRowCells.length === possibleValues.length) {
+      for (let col = 0; col < 9; col++) {
+        let cell = getCell({ row, col })
+        if (sameRowCells.includes(cell)) continue
+        for (let value of possibleValues) {
+          let index = value - 1
+          cell.possibleValues.items[index].hidden = true
+        }
+      }
+    }
+    if (sameColCells.length === possibleValues.length) {
+      for (let row = 0; row < 9; row++) {
+        let cell = getCell({ row, col })
+        if (sameColCells.includes(cell)) continue
+        for (let value of possibleValues) {
+          let index = value - 1
+          cell.possibleValues.items[index].hidden = true
+        }
+      }
+    }
+    if (sameGroupCells.length === possibleValues.length) {
+      for (let cell of table.groups[group]) {
+        if (sameGroupCells.includes(cell)) continue
+        for (let value of possibleValues) {
+          let index = value - 1
+          cell.possibleValues.items[index].hidden = true
+        }
+      }
+    }
   }
-  for (let cell of table.groups[group]) {
-    cell.possibleValues.items[index].hidden = true
+  function removeComboValues(cell: Cell) {}
+}
+
+function getIsSamePossibleValues(a: number[], b: Cell | number[]): boolean {
+  if (!Array.isArray(b)) {
+    b = getPossibleValues(b)
   }
+  if (a.length !== b.length) return false
+  let n = a.length
+  for (let i = 0; i < n; i++) {
+    if (a[i] !== b[i]) return false
+  }
+  return true
+}
+
+function removeByValue(cells: Cell[], cell: Cell) {
+  let index = cells.indexOf(cell)
+  if (index !== -1) cells.splice(index, 1)
 }
 
 function exportTable() {
@@ -279,6 +356,9 @@ function solveTable() {
         cell.input.value = possibleValues[0].toString()
         updateCell(cell)
         continue solve_loop
+      }
+      if (possibleValues.length > 1) {
+        populatePossibleValues(cell)
       }
     }
     break
