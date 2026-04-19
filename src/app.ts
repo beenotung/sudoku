@@ -147,10 +147,7 @@ function getCell(options: { row: number; col: number }): Cell {
   return cell
 }
 
-function getInput(options: {
-  row: number
-  col: number
-}): HTMLInputElement | null {
+function getInput(options: { row: number; col: number }): HTMLInputElement {
   return getCell(options).input
 }
 
@@ -158,7 +155,7 @@ function focusCell(options: { row: number; col: number }) {
   let row = (options.row + 9) % 9
   let col = (options.col + 9) % 9
   let input = getInput({ row, col })
-  input?.focus()
+  input.focus()
 }
 
 function updateCell(cell: Cell) {
