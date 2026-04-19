@@ -1,5 +1,6 @@
 /* buttons */
 declare var importButton: HTMLButtonElement
+declare var exportButton: HTMLButtonElement
 declare var solveButton: HTMLButtonElement
 
 /* import dialog */
@@ -70,7 +71,10 @@ function initCell(options: { row: number; col: number }): Cell {
   td.dataset.col = options.col.toString()
   td.dataset.group = group.toString()
   input.inputMode = 'numeric'
-  input.addEventListener('input', exportTable)
+  input.addEventListener('input', () => {
+    updateCell(cell)
+    console.log(exportTable())
+  })
   input.addEventListener('keydown', event => {
     switch (event.key) {
       case 'ArrowLeft':
@@ -120,6 +124,14 @@ function focusCell(options: { row: number; col: number }) {
   input?.focus()
 }
 
+function updateCell(cell: Cell) {
+  let input = cell.input
+  let value = input.value
+  if (value.length > 1) {
+    input.value = value.slice(-1).trim()
+  }
+}
+
 function exportTable() {
   let text = ''
   for (let row = 0; row < 9; row++) {
@@ -130,7 +142,7 @@ function exportTable() {
     }
     text += '\n'
   }
-  console.log(text)
+  return text
 }
 
 function importTable() {
@@ -159,6 +171,11 @@ function importTable() {
 importTextarea.addEventListener('input', importTable)
 
 importButton.addEventListener('click', () => {
+  importDialog.showModal()
+})
+
+exportButton.addEventListener('click', () => {
+  importTextarea.value = exportTable()
   importDialog.showModal()
 })
 
