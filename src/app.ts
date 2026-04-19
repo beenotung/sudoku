@@ -173,6 +173,9 @@ function resetPossibleValues() {
 function populatePossibleValues(cell: Cell) {
   let value = +cell.input.value
   if (!value) return
+  for (let item of cell.possibleValues.items) {
+    item.hidden = true
+  }
   let index = value - 1
   let { row, col, group } = cell
   for (let col = 0; col < 9; col++) {
@@ -255,41 +258,20 @@ hideHintButton.hidden = false
 solveButton.addEventListener('click', solveTable)
 
 function solveTable() {
-  for (let row = 0; row < 9; row++) {
-    for (let col = 0; col < 9; col++) {
-      let group = toGroupIndex({ row, col })
-      let input = getInput({ row, col })!
-      let value = input.value
-      if (value) {
-        // this cell is already filled
-        continue
+  solve_loop: for (;;) {
+    for (let cell of table.cells) {
+      let possibleValues: number[] = []
+      for (let item of cell.possibleValues.items) {
+        if (item.hidden) continue
+        possibleValues.push(+item.dataset.value!)
       }
-
-      // init all possible values
-      let possibleValues = new Set<number>()
-      for (let i = 1; i <= 9; i++) {
-        possibleValues.add(i)
+      if (possibleValues.length === 1) {
+        cell.input.value = possibleValues[0].toString()
+        updateCell(cell)
+        continue solve_loop
       }
-
-      // remove values in the same row
-      for (let row = 0; row < 9; row++) {
-        possibleValues.delete(getValue({ row, col })!)
-      }
-
-      // remove values in the same column
-      for (let col = 0; col < 9; col++) {
-        possibleValues.delete(getValue({ row, col })!)
-      }
-
-      // remove values in the same group
-      for (let cell of table.cells) {
-        if (cell.group == group) {
-          possibleValues.delete(getValue(cell)!)
-        }
-      }
-
-      console.log({ row, col, possibleValues })
     }
+    break
   }
 }
 
