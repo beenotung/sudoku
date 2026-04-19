@@ -1,5 +1,6 @@
 /* buttons */
 declare var emptyButton: HTMLButtonElement
+declare var startButton: HTMLButtonElement
 declare var importButton: HTMLButtonElement
 declare var exportButton: HTMLButtonElement
 declare var resetButton: HTMLButtonElement
@@ -319,6 +320,11 @@ importTextarea.addEventListener('input', importTable)
 
 emptyButton.addEventListener('click', () => {
   importTextarea.value = ''
+  importTable()
+})
+
+startButton.addEventListener('click', () => {
+  importTextarea.value = exportTable()
   importTable()
 })
 
