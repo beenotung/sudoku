@@ -19,10 +19,13 @@ type Cell = {
 }
 
 type Table = {
-  groups: Cell[]
+  cells: Cell[]
+  rows: Cell[][]
+  cols: Cell[][]
+  groups: Cell[][]
 }
 
-function initTable(): Cell[] {
+function initTable(): Table {
   let cells: Cell[] = []
   for (let row = 0; row < 9; row++) {
     let tr = document.createElement('tr')
@@ -33,7 +36,22 @@ function initTable(): Cell[] {
     }
     sudokuTableBody.appendChild(tr)
   }
-  return cells
+  function createArray() {
+    let array = new Array(9)
+    for (let i = 0; i < 9; i++) {
+      array[i] = []
+    }
+    return array
+  }
+  let rows: Cell[][] = createArray()
+  let cols: Cell[][] = createArray()
+  let groups: Cell[][] = createArray()
+  for (let cell of cells) {
+    rows[cell.row].push(cell)
+    cols[cell.col].push(cell)
+    groups[cell.group].push(cell)
+  }
+  return { cells, rows, cols, groups }
 }
 
 function toGroupIndex(options: { row: number; col: number }) {
@@ -70,10 +88,17 @@ function initCell(options: { row: number; col: number }): Cell {
     }
   })
   td.appendChild(input)
-  return { td, input, group, row: options.row, col: options.col }
+  let cell: Cell = {
+    td,
+    input,
+    group,
+    row: options.row,
+    col: options.col,
+  }
+  return cell
 }
 
-let cells = initTable()
+let table = initTable()
 
 function getInput(options: {
   row: number
@@ -97,18 +122,14 @@ function focusCell(options: { row: number; col: number }) {
 
 function exportTable() {
   let text = ''
-  sudokuTable.querySelectorAll('tr').forEach(tr => {
-    tr.querySelectorAll('td').forEach(td => {
-      let input = td.querySelector('input')!
-      let value = input.value
-      if (value.length > 1) {
-        value = value.slice(-1)
-        input.value = value.trim()
-      }
-      text += value || '_'
-    })
+  for (let row = 0; row < 9; row++) {
+    let cols = table.rows[row]
+    for (let col = 0; col < 9; col++) {
+      let cell = cols[col]
+      text += cell.input.value || '_'
+    }
     text += '\n'
-  })
+  }
   console.log(text)
 }
 
