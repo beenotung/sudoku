@@ -1,6 +1,7 @@
 /* buttons */
 declare var importButton: HTMLButtonElement
 declare var exportButton: HTMLButtonElement
+declare var resetButton: HTMLButtonElement
 declare var showHintButton: HTMLButtonElement
 declare var hideHintButton: HTMLButtonElement
 declare var solveButton: HTMLButtonElement
@@ -235,6 +236,8 @@ exportButton.addEventListener('click', () => {
   importTextarea.value = exportTable()
   importDialog.showModal()
 })
+
+resetButton.addEventListener('click', importTable)
 
 showHintButton.addEventListener('click', () => {
   showHintButton.hidden = true
