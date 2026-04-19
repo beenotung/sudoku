@@ -128,17 +128,19 @@ function initPossibleValues() {
 
 let table = initTable()
 
+function getCell(options: { row: number; col: number }): Cell {
+  let cell = table.rows[options.row]?.[options.col]
+  if (!cell) {
+    throw new Error(`cell not found: ${options.row}, ${options.col}`)
+  }
+  return cell
+}
+
 function getInput(options: {
   row: number
   col: number
 }): HTMLInputElement | null {
-  let input = sudokuTable.querySelector<HTMLInputElement>(
-    `tr:nth-child(${options.row + 1}) td:nth-child(${options.col + 1}) input`,
-  )
-  if (!input) {
-    return null
-  }
-  return input
+  return getCell(options).input
 }
 
 function focusCell(options: { row: number; col: number }) {
