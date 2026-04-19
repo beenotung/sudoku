@@ -18,3 +18,14 @@ Hosted on [https://sudoku-editor.surge.sh/](https://sudoku-editor.surge.sh/)
 - **Start** — Turn your current layout into the puzzle: cells that already have digits become fixed **initial** numbers; empty cells are where you play.
 - **Import / export** — Load or paste puzzles as plain text, or copy the grid to share or save (nine rows of digits; blanks as `_` or space). **Reset** returns the board to the puzzle you last loaded or pasted.
 - **Solve** — Fills in whatever the solver can deduce from the current grid; on the hardest puzzles you may still need more steps yourself.
+
+## License
+
+This project is licensed with [BSD-2-Clause](./LICENSE)
+
+This is free, libre, and open-source software. It comes down to four essential freedoms [[ref]](https://seirdy.one/2021/01/27/whatsapp-and-the-domestication-of-users.html#fnref:2):
+
+- The freedom to run the program as you wish, for any purpose
+- The freedom to study how the program works, and change it so it does your computing as you wish
+- The freedom to redistribute copies so you can help others
+- The freedom to distribute copies of your modified versions to others
