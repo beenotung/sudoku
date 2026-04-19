@@ -99,9 +99,13 @@ function exportTable() {
   let text = ''
   sudokuTable.querySelectorAll('tr').forEach(tr => {
     tr.querySelectorAll('td').forEach(td => {
-      let input = td.querySelector('input')
-      let value = input?.value || '_'
-      text += value
+      let input = td.querySelector('input')!
+      let value = input.value
+      if (value.length > 1) {
+        value = value.slice(-1)
+        input.value = value.trim()
+      }
+      text += value || '_'
     })
     text += '\n'
   })
