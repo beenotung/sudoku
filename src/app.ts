@@ -172,9 +172,16 @@ function resetPossibleValues() {
   }
 }
 
-function populatePossibleValues(cell: Cell) {
+function populatePossibleValues(cell: Cell): { changed: boolean } {
   let value = +cell.input.value
   let { row, col, group } = cell
+
+  let changed = false
+  function setHidden(item: HTMLDivElement) {
+    if (item.hidden) return
+    item.hidden = true
+    changed = true
+  }
 
   if (value) {
     let index = value - 1
@@ -184,15 +191,15 @@ function populatePossibleValues(cell: Cell) {
 
     // remove direct values in the same row/col/group
     for (let col = 0; col < 9; col++) {
-      getCell({ row, col }).possibleValues.items[index].hidden = true
+      setHidden(getCell({ row, col }).possibleValues.items[index])
     }
     for (let row = 0; row < 9; row++) {
-      getCell({ row, col }).possibleValues.items[index].hidden = true
+      setHidden(getCell({ row, col }).possibleValues.items[index])
     }
     for (let cell of table.groups[group]) {
-      cell.possibleValues.items[index].hidden = true
+      setHidden(cell.possibleValues.items[index])
     }
-    return
+    return { changed }
   }
 
   // remove combo-values in the same row/col
@@ -224,7 +231,7 @@ function populatePossibleValues(cell: Cell) {
         if (sameRowCells.includes(cell)) continue
         for (let value of possibleValues) {
           let index = value - 1
-          cell.possibleValues.items[index].hidden = true
+          setHidden(cell.possibleValues.items[index])
         }
       }
     }
@@ -234,7 +241,7 @@ function populatePossibleValues(cell: Cell) {
         if (sameColCells.includes(cell)) continue
         for (let value of possibleValues) {
           let index = value - 1
-          cell.possibleValues.items[index].hidden = true
+          setHidden(cell.possibleValues.items[index])
         }
       }
     }
@@ -243,12 +250,12 @@ function populatePossibleValues(cell: Cell) {
         if (sameGroupCells.includes(cell)) continue
         for (let value of possibleValues) {
           let index = value - 1
-          cell.possibleValues.items[index].hidden = true
+          setHidden(cell.possibleValues.items[index])
         }
       }
     }
   }
-  function removeComboValues(cell: Cell) {}
+  return { changed }
 }
 
 function getIsSamePossibleValues(a: number[], b: Cell | number[]): boolean {
@@ -364,7 +371,9 @@ function solveTable() {
         continue solve_loop
       }
       if (possibleValues.length > 1) {
-        populatePossibleValues(cell)
+        if (populatePossibleValues(cell).changed) {
+          continue solve_loop
+        }
       }
     }
     break
