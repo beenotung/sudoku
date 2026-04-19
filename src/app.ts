@@ -370,11 +370,46 @@ function solveTable() {
   solve_loop: for (;;) {
     for (let cell of table.cells) {
       let possibleValues = getPossibleValues(cell)
+
+      // check for only one possible value
       if (possibleValues.length === 1) {
         cell.input.value = possibleValues[0].toString()
         updateCell(cell)
         continue solve_loop
       }
+
+      // check for unique position possible values
+      let { row, col, group } = cell
+      for (let value of possibleValues) {
+        let index = value - 1
+        let otherInRow: Cell | null = null
+        let otherInCol: Cell | null = null
+        let otherInGroup: Cell | null = null
+        for (let col = 0; col < 9; col++) {
+          let otherCell = getCell({ row, col })
+          if (otherCell === cell) continue
+          if (otherCell.possibleValues.items[index].hidden) continue
+          otherInRow = otherCell
+        }
+        for (let row = 0; row < 9; row++) {
+          let otherCell = getCell({ row, col })
+          if (otherCell === cell) continue
+          if (otherCell.possibleValues.items[index].hidden) continue
+          otherInCol = otherCell
+        }
+        for (let otherCell of table.groups[group]) {
+          if (otherCell === cell) continue
+          if (otherCell.possibleValues.items[index].hidden) continue
+          otherInGroup = otherCell
+        }
+        if (!otherInRow || !otherInCol || !otherInGroup) {
+          cell.input.value = value.toString()
+          updateCell(cell)
+          continue solve_loop
+        }
+      }
+
+      // check for inferrable possible values
       if (possibleValues.length > 1) {
         if (populatePossibleValues(cell).changed) {
           continue solve_loop
