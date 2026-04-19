@@ -202,7 +202,7 @@ function populatePossibleValues(cell: Cell): { changed: boolean } {
     return { changed }
   }
 
-  // remove combo-values in the same row/col
+  // remove combo-values in the same row/col/group
   let possibleValues = getPossibleValues(cell)
   if (possibleValues.length > 1) {
     // scan same row/col/group
@@ -254,6 +254,34 @@ function populatePossibleValues(cell: Cell): { changed: boolean } {
         if (sameGroupCells.includes(cell)) continue
         for (let value of possibleValues) {
           let index = value - 1
+          setHidden(cell.possibleValues.items[index])
+        }
+      }
+    }
+
+    // remove other row/col, due to being same row/col in the same group for the same value
+    for (let value of possibleValues) {
+      let index = value - 1
+      let groupRows = new Set<number>()
+      let groupCols = new Set<number>()
+      for (let cell of table.groups[group]) {
+        if (cell.possibleValues.items[index].hidden) continue
+        groupRows.add(cell.row)
+        groupCols.add(cell.col)
+      }
+      if (groupRows.size === 1) {
+        let row = Array.from(groupRows)[0]
+        for (let col = 0; col < 9; col++) {
+          let cell = getCell({ row, col })
+          if (cell.group === group) continue
+          setHidden(cell.possibleValues.items[index])
+        }
+      }
+      if (groupCols.size === 1) {
+        let col = Array.from(groupCols)[0]
+        for (let row = 0; row < 9; row++) {
+          let cell = getCell({ row, col })
+          if (cell.group === group) continue
           setHidden(cell.possibleValues.items[index])
         }
       }
