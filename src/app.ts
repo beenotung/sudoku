@@ -158,6 +158,31 @@ function updateCell(cell: Cell) {
     input.value = value
   }
   cell.possibleValues.container.hidden = value.length > 0
+  populatePossibleValues(cell)
+}
+
+function resetPossibleValues() {
+  for (let cell of table.cells) {
+    for (let item of cell.possibleValues.items) {
+      item.hidden = false
+    }
+  }
+}
+
+function populatePossibleValues(cell: Cell) {
+  let value = +cell.input.value
+  if (!value) return
+  let index = value - 1
+  let { row, col, group } = cell
+  for (let col = 0; col < 9; col++) {
+    getCell({ row, col }).possibleValues.items[index].hidden = true
+  }
+  for (let row = 0; row < 9; row++) {
+    getCell({ row, col }).possibleValues.items[index].hidden = true
+  }
+  for (let cell of table.groups[group]) {
+    cell.possibleValues.items[index].hidden = true
+  }
 }
 
 function exportTable() {
@@ -195,6 +220,7 @@ function importTable() {
       }
     })
   })
+  resetPossibleValues()
   for (let cell of table.cells) {
     updateCell(cell)
   }
