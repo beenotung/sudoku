@@ -284,6 +284,83 @@ function populatePossibleValues(cell: Cell): { changed: boolean } {
       }
     }
   }
+
+  // find x-y chain
+  if (possibleValues.length === 2) {
+    // walk the x-y chain
+    let stack: {
+      steps: Cell[]
+      start_value: number
+      expected_value: number
+    }[] = []
+    stack.push({
+      steps: [cell],
+      start_value: possibleValues[0],
+      expected_value: possibleValues[1],
+    })
+    stack.push({
+      steps: [cell],
+      start_value: possibleValues[1],
+      expected_value: possibleValues[0],
+    })
+    while (stack.length > 0) {
+      let { steps, start_value, expected_value } = stack.pop()!
+
+      // check for elimination chance
+      if (start_value === expected_value) {
+        let index = start_value - 1
+        let start_cell = steps[0]
+        let end_cell = steps[steps.length - 1]
+
+        // check for same row/col/group
+        let check_groups = [
+          [start_cell.row, end_cell.row, table.rows],
+          [start_cell.col, end_cell.col, table.cols],
+          [start_cell.group, end_cell.group, table.groups],
+        ] as const
+        for (let [start, end, cells] of check_groups) {
+          if (start !== end) continue
+          for (let cell of cells[start]) {
+            if (cell === start_cell || cell === end_cell) continue
+            setHidden(cell.possibleValues.items[index])
+          }
+        }
+      }
+
+      let current = steps[steps.length - 1]
+      let cell_groups = [
+        table.rows[current.row],
+        table.cols[current.col],
+        table.groups[current.group],
+      ]
+      for (let cell_group of cell_groups) {
+        for (let cell of cell_group) {
+          // avoid endless loop
+          if (steps.includes(cell)) continue
+
+          // check for suitable next step
+          let possibleValues = getPossibleValues(cell)
+          if (possibleValues.length !== 2) continue
+          let [value_1, value_2] = possibleValues
+          let next_value: number | null = null
+          if (value_1 === expected_value) {
+            next_value = value_2
+          } else if (value_2 === expected_value) {
+            next_value = value_1
+          }
+          if (!next_value) continue
+
+          // continue the walk
+          stack.push({
+            steps: [...steps, cell],
+            start_value,
+            expected_value: next_value,
+          })
+        }
+      }
+    }
+  }
+
   return { changed }
 }
 
