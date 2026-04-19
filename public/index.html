@@ -61,6 +61,9 @@
         font-size: calc(var(--size) / 3);
         /* background-color: rgba(0, 0, 0, 0.5); */
       }
+      #sudokuTable.hide-hint .possible-values--container {
+        display: none;
+      }
       .possible-values--item {
         width: calc((var(--size) + 0.5rem) / 3);
         height: calc((var(--size) + 0.5rem) / 3);
@@ -80,6 +83,8 @@
     <div class="buttons">
       <button id="importButton">Import</button>
       <button id="exportButton">Export</button>
+      <button id="showHintButton">Show Hint</button>
+      <button id="hideHintButton">Hide Hint</button>
       <button id="solveButton">Solve</button>
     </div>
     <dialog id="importDialog">

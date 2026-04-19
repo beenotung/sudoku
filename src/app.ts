@@ -1,6 +1,8 @@
 /* buttons */
 declare var importButton: HTMLButtonElement
 declare var exportButton: HTMLButtonElement
+declare var showHintButton: HTMLButtonElement
+declare var hideHintButton: HTMLButtonElement
 declare var solveButton: HTMLButtonElement
 
 /* import dialog */
@@ -205,6 +207,19 @@ exportButton.addEventListener('click', () => {
   importTextarea.value = exportTable()
   importDialog.showModal()
 })
+
+showHintButton.addEventListener('click', () => {
+  showHintButton.hidden = true
+  hideHintButton.hidden = false
+  sudokuTable.classList.remove('hide-hint')
+})
+hideHintButton.addEventListener('click', () => {
+  showHintButton.hidden = false
+  hideHintButton.hidden = true
+  sudokuTable.classList.add('hide-hint')
+})
+showHintButton.hidden = true
+hideHintButton.hidden = false
 
 solveButton.addEventListener('click', solveTable)
 
