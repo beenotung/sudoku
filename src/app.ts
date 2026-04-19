@@ -26,6 +26,7 @@ type Cell = {
     container: HTMLDivElement
     items: HTMLDivElement[]
   }
+  peers: Cell[]
 }
 
 type Table = {
@@ -60,6 +61,15 @@ function initTable(): Table {
     rows[cell.row].push(cell)
     cols[cell.col].push(cell)
     groups[cell.group].push(cell)
+  }
+  for (let cell of cells) {
+    for (let cells of [rows[cell.row], cols[cell.col], groups[cell.group]]) {
+      for (let peer of cells) {
+        if (peer === cell) continue
+        if (cell.peers.includes(peer)) continue
+        cell.peers.push(peer)
+      }
+    }
   }
   return { cells, rows, cols, groups }
 }
@@ -107,6 +117,7 @@ function initCell(options: { row: number; col: number }): Cell {
     row: options.row,
     col: options.col,
     possibleValues,
+    peers: [],
   }
   return cell
 }
@@ -285,32 +296,21 @@ function populatePossibleValues(cell: Cell): { changed: boolean } {
     }
   }
 
-  // find x-y chain
+  // find x-y chain (DFS with reusable path)
   if (possibleValues.length === 2) {
-    // walk the x-y chain
-    let stack: {
-      steps: Cell[]
-      start_value: number
-      expected_value: number
-    }[] = []
-    stack.push({
-      steps: [cell],
-      start_value: possibleValues[0],
-      expected_value: possibleValues[1],
-    })
-    stack.push({
-      steps: [cell],
-      start_value: possibleValues[1],
-      expected_value: possibleValues[0],
-    })
-    while (stack.length > 0) {
-      let { steps, start_value, expected_value } = stack.pop()!
+    let pathWalked = new Set<Cell>()
+    // let steps: Cell[] = []
+    let start_cell = cell
 
+    function walkXYChain(
+      current_cell: Cell,
+      start_value: number,
+      expected_value: number,
+    ) {
       // check for elimination chance
       if (start_value === expected_value) {
         let index = start_value - 1
-        let start_cell = steps[0]
-        let end_cell = steps[steps.length - 1]
+        let end_cell = current_cell
 
         // check for same row/col/group
         let check_groups = [
@@ -327,38 +327,33 @@ function populatePossibleValues(cell: Cell): { changed: boolean } {
         }
       }
 
-      let current = steps[steps.length - 1]
-      let cell_groups = [
-        table.rows[current.row],
-        table.cols[current.col],
-        table.groups[current.group],
-      ]
-      for (let cell_group of cell_groups) {
-        for (let cell of cell_group) {
-          // avoid endless loop
-          if (steps.includes(cell)) continue
+      for (let next_cell of current_cell.peers) {
+        // avoid endless loop
+        if (pathWalked.has(next_cell)) continue
 
-          // check for suitable next step
-          let possibleValues = getPossibleValues(cell)
-          if (possibleValues.length !== 2) continue
-          let [value_1, value_2] = possibleValues
-          let next_value: number | null = null
-          if (value_1 === expected_value) {
-            next_value = value_2
-          } else if (value_2 === expected_value) {
-            next_value = value_1
-          }
-          if (!next_value) continue
-
-          // continue the walk
-          stack.push({
-            steps: [...steps, cell],
-            start_value,
-            expected_value: next_value,
-          })
+        // check for suitable next step (bivalue cell that contains expected_value)
+        let nextPossible = getPossibleValues(next_cell)
+        if (nextPossible.length !== 2) continue
+        let [value_1, value_2] = nextPossible
+        let next_value: number | null = null
+        if (value_1 === expected_value) {
+          next_value = value_2
+        } else if (value_2 === expected_value) {
+          next_value = value_1
         }
+        if (!next_value) continue
+
+        // continue the walk for x-y chain
+        pathWalked.add(next_cell)
+        walkXYChain(next_cell, start_value, next_value)
+        pathWalked.delete(next_cell)
       }
     }
+
+    pathWalked.add(cell)
+    walkXYChain(cell, possibleValues[0], possibleValues[1])
+    walkXYChain(cell, possibleValues[1], possibleValues[0])
+    pathWalked.delete(cell)
   }
 
   return { changed }
